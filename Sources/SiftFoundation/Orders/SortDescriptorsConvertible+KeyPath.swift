@@ -1,13 +1,20 @@
+import Foundation
 
+/// An order operator, such as a keypath, that can produce sort descriptors in either direction.
 public protocol SortDescriptorsConvertibleOperator<Root> {
     associatedtype Root
 
-    @available(macOS 12.0, *)
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     func sortDescriptors(ascending: Bool) -> [SortDescriptor<Root>]
     func nsSortDescriptors(ascending: Bool) -> [NSSortDescriptor]
 }
 
-@available(macOS 12.0, *)
+/// A value type that Foundation's `SortDescriptor` can sort by keypath.
+///
+/// `Bool`, the integer types, `Double`, `Float`, `Date` and `UUID` conform, and so do their
+/// optionals. Strings are sorted with a comparator instead; see
+/// `Ascending(_:comparator:)`.
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 public protocol SortDescriptorUsableValue {
     static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Self>,
@@ -15,17 +22,29 @@ public protocol SortDescriptorUsableValue {
     ) -> SortDescriptor<Root>
 }
 
-@available(macOS 12.0, *)
-extension Bool: SortDescriptorUsableValue {
+/// A value type whose optional form `SortDescriptor` can sort by keypath.
+///
+/// Swift allows `Optional` only one conditional conformance to `SortDescriptorUsableValue`,
+/// so the optional case is forwarded through this protocol on the wrapped type.
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+public protocol SortDescriptorUsableOptionalWrapped {
+    static func sortDescriptor<Root: NSObject>(
+        forOptional keyPath: KeyPath<Root, Self?>,
+        order: SortOrder
+    ) -> SortDescriptor<Root>
+}
+
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+extension Optional: SortDescriptorUsableValue where Wrapped: SortDescriptorUsableOptionalWrapped {
     public static func sortDescriptor<Root: NSObject>(
-        for keyPath: KeyPath<Root, Bool>,
+        for keyPath: KeyPath<Root, Wrapped?>,
         order: SortOrder
     ) -> SortDescriptor<Root> {
-        .init(keyPath, order: order)
+        Wrapped.sortDescriptor(forOptional: keyPath, order: order)
     }
 }
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension KeyPath: SortDescriptorsConvertible where Root: NSObject, Value: SortDescriptorUsableValue {
     public var sortDescriptors: [SortDescriptor<Root>] {
         [Value.sortDescriptor(for: self, order: .forward)]
@@ -36,7 +55,7 @@ extension KeyPath: SortDescriptorsConvertible where Root: NSObject, Value: SortD
     }
 }
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension KeyPath: SortDescriptorsConvertibleOperator where Root: NSObject, Value: SortDescriptorUsableValue {
     public func sortDescriptors(ascending: Bool) -> [SortDescriptor<Root>] {
         [Value.sortDescriptor(for: self, order: ascending ? .forward : .reverse)]
@@ -48,7 +67,7 @@ extension KeyPath: SortDescriptorsConvertibleOperator where Root: NSObject, Valu
 }
 
 extension Ascending: SortDescriptorsConvertible where Operator: SortDescriptorsConvertibleOperator {
-    @available(macOS 12.0, *)
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public var sortDescriptors: [SortDescriptor<Operator.Root>] {
         self.operator.sortDescriptors(ascending: true)
     }
@@ -59,7 +78,7 @@ extension Ascending: SortDescriptorsConvertible where Operator: SortDescriptorsC
 }
 
 extension Descending: SortDescriptorsConvertible where Operator: SortDescriptorsConvertibleOperator {
-    @available(macOS 12.0, *)
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public var sortDescriptors: [SortDescriptor<Operator.Root>] {
         self.operator.sortDescriptors(ascending: false)
     }
@@ -70,11 +89,11 @@ extension Descending: SortDescriptorsConvertible where Operator: SortDescriptors
 }
 
 extension Reverse: SortDescriptorsConvertible where O: SortDescriptorsConvertible {
-    @available(macOS 12.0, *)
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public var sortDescriptors: [SortDescriptor<O.Root>] {
         self.order.sortDescriptors.map { descriptor in
             var copy = descriptor
-            copy.order = .reverse
+            copy.order = descriptor.order == .forward ? .reverse : .forward
             return copy
         }
     }

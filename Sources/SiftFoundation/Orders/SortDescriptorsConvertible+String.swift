@@ -1,5 +1,6 @@
+import Foundation
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension StringComparatorOrderOperator: SortDescriptorsConvertibleOperator where Root: NSObject {
     public func nsSortDescriptors(ascending: Bool) -> [NSSortDescriptor] {
         sortDescriptors(ascending: ascending).map(NSSortDescriptor.init)
@@ -10,7 +11,7 @@ extension StringComparatorOrderOperator: SortDescriptorsConvertibleOperator wher
     }
 }
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension OptionalStringComparatorOrderOperator: SortDescriptorsConvertibleOperator where Root: NSObject {
     public func nsSortDescriptors(ascending: Bool) -> [NSSortDescriptor] {
         sortDescriptors(ascending: ascending).map(NSSortDescriptor.init)

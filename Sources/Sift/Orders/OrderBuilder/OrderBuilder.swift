@@ -1,4 +1,6 @@
 
+/// A result builder that concatenates orders. A bare keypath means ``Ascending``, and each
+/// statement breaks ties left by the statements before it.
 @resultBuilder
 public struct OrderBuilder<Root> {
 

@@ -50,3 +50,13 @@ extension GreaterThanOrEqualOperator: SwiftEvaluablePredicateValueOperator where
         first >= second
     }
 }
+
+extension OptionalComparison: SwiftEvaluablePredicateValueOperator
+where Base: SwiftEvaluablePredicateValueOperator {
+    public static func compare(_ first: Base.Value?, with second: Base.Value?) -> Bool {
+        guard let first = first, let second = second else {
+            return false
+        }
+        return Base.compare(first, with: second)
+    }
+}

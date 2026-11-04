@@ -1,13 +1,18 @@
 
+/// Compares the value at a keypath with a constant value.
 public struct KeyPathValuePredicateValue<
     Root,
     Operator: PredicateValueOperator
->: PredicateValue {
+>: SiftPredicateValue {
     public typealias Value = Operator.Value
 
     public let keyPath: KeyPath<Root, Value>
     public let value: Value
 
+    public init(keyPath: KeyPath<Root, Value>, value: Value) {
+        self.keyPath = keyPath
+        self.value = value
+    }
 }
 
 // MARK: Equality
@@ -40,8 +45,8 @@ public func != <Root, Value>(
     .init(keyPath: rhs, value: lhs)
 }
 
-
 // MARK: Order
+// When the value is on the left, the operator is flipped so the keypath is always stored first.
 
 public func < <Root, Value>(
     lhs: KeyPath<Root, Value>,

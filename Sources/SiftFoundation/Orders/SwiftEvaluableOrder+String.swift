@@ -1,12 +1,13 @@
+import Foundation
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension StringComparatorOrderOperator: SwiftEvaluableOrder {
     public func isLessThan(_ lhs: Root, _ rhs: Root) -> Bool {
         comparator.compare(lhs[keyPath: keyPath], rhs[keyPath: keyPath]) == .orderedAscending
     }
 }
 
-@available(macOS 12.0, *)
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension OptionalStringComparatorOrderOperator: SwiftEvaluableOrder {
     public func isLessThan(_ lhs: Root, _ rhs: Root) -> Bool {
         guard let lhsValue = lhs[keyPath: keyPath] else {

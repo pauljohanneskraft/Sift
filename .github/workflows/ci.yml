@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  macos:
+    name: macOS build and test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (warnings as errors)
+        run: swift build --build-tests -Xswiftc -warnings-as-errors
+      - name: Test
+        run: swift test
+
+  apple-platforms:
+    name: iOS build and documentation
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build for iOS
+        run: xcodebuild -scheme Sift-Package -destination 'generic/platform=iOS' build
+      - name: Build documentation
+        run: xcodebuild docbuild -scheme Sift-Package -destination 'generic/platform=macOS'
+
+  linux-core:
+    # SiftFoundation relies on Objective-C keypaths, and SwiftPM builds every test target,
+    # so only the Foundation-free core is built on Linux.
+    name: Linux core build
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Sift
+        run: swift build --target Sift

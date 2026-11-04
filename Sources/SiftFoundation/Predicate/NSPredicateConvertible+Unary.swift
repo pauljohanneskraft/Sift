@@ -1,3 +1,4 @@
+import Foundation
 public protocol NSPredicateConvertibleUnaryOperator {
     static func transform(_ value: NSPredicate) -> NSPredicate
 }

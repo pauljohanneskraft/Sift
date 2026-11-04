@@ -1,14 +1,20 @@
 
+/// Marker for logical negation.
 public enum NotOperator {}
 
+/// A predicate that transforms the result of another predicate, for example ``Not``.
 public struct UnaryPredicate<
-    Content: Predicate,
+    Content: SiftPredicate,
     Operator
->: Predicate {
+>: SiftPredicate {
 
     public typealias Root = Content.Root
 
     public let content: Content
+
+    public init(_ content: Content) {
+        self.content = content
+    }
 
     public init(content: Content) {
         self.content = content
@@ -16,9 +22,9 @@ public struct UnaryPredicate<
 
 }
 
-public typealias Not<Content: Predicate> =
+public typealias Not<Content: SiftPredicate> =
     UnaryPredicate<Content, NotOperator>
 
-public prefix func ! <P: Predicate>(content: P) -> UnaryPredicate<P, NotOperator> {
-    .init(content: content)
+public prefix func ! <P: SiftPredicate>(content: P) -> Not<P> {
+    .init(content)
 }

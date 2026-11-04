@@ -1,11 +1,11 @@
-
 import Foundation
 
 public protocol NSPredicateConvertibleBinaryPredicateOperator {
     static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate
 }
 
-extension BinaryPredicate: NSPredicateConvertible where First: NSPredicateConvertible, Second: NSPredicateConvertible, Operator: NSPredicateConvertibleBinaryPredicateOperator {
+extension BinaryPredicate: NSPredicateConvertible
+where First: NSPredicateConvertible, Second: NSPredicateConvertible, Operator: NSPredicateConvertibleBinaryPredicateOperator {
     public var predicate: NSPredicate {
         Operator.combine(elements.first.predicate, with: elements.second.predicate)
     }
@@ -19,7 +19,21 @@ extension AndOperator: NSPredicateConvertibleBinaryPredicateOperator {
 
 extension OrOperator: NSPredicateConvertibleBinaryPredicateOperator {
     public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
-        NSCompoundPredicate(andPredicateWithSubpredicates: [first, second])
+        NSCompoundPredicate(orPredicateWithSubpredicates: [first, second])
+    }
+}
+
+extension XorOperator: NSPredicateConvertibleBinaryPredicateOperator {
+    public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
+        // (A AND NOT B) OR (NOT A AND B)
+        NSCompoundPredicate(orPredicateWithSubpredicates: [
+            NSCompoundPredicate(andPredicateWithSubpredicates: [
+                first, NSCompoundPredicate(notPredicateWithSubpredicate: second),
+            ]),
+            NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSCompoundPredicate(notPredicateWithSubpredicate: first), second,
+            ]),
+        ])
     }
 }
 
