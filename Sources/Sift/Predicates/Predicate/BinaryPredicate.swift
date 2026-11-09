@@ -1,50 +1,56 @@
-
+/// Marker for a logical AND of two predicates.
 public enum AndOperator {}
+/// Marker for a logical OR of two predicates.
 public enum OrOperator {}
+/// Marker for a logical exclusive OR of two predicates.
 public enum XorOperator {}
+/// Marker for a logical NAND (not both) of two predicates.
 public enum NandOperator {}
 
+/// A predicate that combines two predicates over the same root with a binary operator.
+///
+/// Use it through the ``And``, ``Or``, ``Xor`` and ``Nand`` typealiases, for example
+/// `Xor(\.isAdmin == true, \.isGuest == true)`, or through the `&&` and `||` operators.
+///
+/// `Root` is a generic parameter rather than derived from `First.Root`, so the type checker
+/// can push the root of an enclosing call, such as `filter(by:)`, down into each operand.
+/// Every keypath literal in a long `&&` chain then resolves on its own, instead of the
+/// solver trying every overload combination of the whole chain.
 public struct BinaryPredicate<
-    First: Predicate,
-    Second: Predicate,
+    Root,
+    First: SiftPredicate<Root>,
+    Second: SiftPredicate<Root>,
     Operator
->: Predicate where First.Root == Second.Root {
-
-    public typealias Root = First.Root
+>: SiftPredicate {
 
     public let elements: (first: First, second: Second)
 
-}
-
-extension BinaryPredicate {
-
-    public init(@PredicateBuilder<Self> _ build: () -> Self) {
-        self = build()
+    public init(_ first: First, _ second: Second) {
+        self.elements = (first, second)
     }
 
 }
 
+public typealias And<Root, First: SiftPredicate<Root>, Second: SiftPredicate<Root>> =
+    BinaryPredicate<Root, First, Second, AndOperator>
 
-public typealias And<First: Predicate, Second: Predicate> =
-    BinaryPredicate<First, Second, AndOperator> where First.Root == Second.Root
+public typealias Or<Root, First: SiftPredicate<Root>, Second: SiftPredicate<Root>> =
+    BinaryPredicate<Root, First, Second, OrOperator>
 
-public typealias Or<First: Predicate, Second: Predicate> =
-    BinaryPredicate<First, Second, OrOperator> where First.Root == Second.Root
+public typealias Xor<Root, First: SiftPredicate<Root>, Second: SiftPredicate<Root>> =
+    BinaryPredicate<Root, First, Second, XorOperator>
 
-public typealias Xor<First: Predicate, Second: Predicate> =
-    BinaryPredicate<First, Second, XorOperator> where First.Root == Second.Root
+public typealias Nand<Root, First: SiftPredicate<Root>, Second: SiftPredicate<Root>> =
+    BinaryPredicate<Root, First, Second, NandOperator>
 
-public typealias Nand<First: Predicate, Second: Predicate> =
-    BinaryPredicate<First, Second, NandOperator> where First.Root == Second.Root
-
-public func && <LHS: Predicate, RHS: Predicate>(
+public func && <Root, LHS: SiftPredicate<Root>, RHS: SiftPredicate<Root>>(
     lhs: LHS, rhs: RHS
-) -> And<LHS, RHS> {
-    .init(elements: (lhs, rhs))
+) -> And<Root, LHS, RHS> {
+    .init(lhs, rhs)
 }
 
-public func || <LHS: Predicate, RHS: Predicate>(
+public func || <Root, LHS: SiftPredicate<Root>, RHS: SiftPredicate<Root>>(
     lhs: LHS, rhs: RHS
-) -> Or<LHS, RHS> {
-    .init(elements: (lhs, rhs))
+) -> Or<Root, LHS, RHS> {
+    .init(lhs, rhs)
 }

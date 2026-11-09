@@ -1,35 +1,57 @@
+import Foundation
 
-public protocol SortDescriptorsConvertible: Order {
+/// An order that can be converted into Foundation sort descriptors.
+///
+/// Orders over `NSObject` subclasses with `@objc` properties conform, because
+/// `NSSortDescriptor` goes through key-value coding.
+public protocol SortDescriptorsConvertible<Root>: Order {
+    associatedtype Root
 
-    @available(macOS 12.0, *)
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     var sortDescriptors: [SortDescriptor<Root>] { get }
 
     var nsSortDescriptors: [NSSortDescriptor] { get }
 }
 
-extension RandomAccessCollection where Element: SortDescriptorsConvertible {
-    public typealias Root = Element.Root
-
-    @available(macOS 12.0, *)
+extension Array: SortDescriptorsConvertible where Element: SortDescriptorsConvertible {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public var sortDescriptors: [SortDescriptor<Element.Root>] {
-        reduce([]) { $0 + $1.sortDescriptors }
+        flatMap { $0.sortDescriptors }
     }
 
     public var nsSortDescriptors: [NSSortDescriptor] {
-        reduce([]) { $0 + $1.nsSortDescriptors }
+        flatMap { $0.nsSortDescriptors }
     }
 }
 
-extension Array: Order, SortDescriptorsConvertible where Element: SortDescriptorsConvertible {}
-extension ArraySlice: Order, SortDescriptorsConvertible where Element: SortDescriptorsConvertible {}
-
-extension Array<NSSortDescriptor> {
-
-    public static func build<O: Order & SortDescriptorsConvertible>(
-        for type: O.Root.Type = O.Root.self,
-        @OrderBuilder<O.Root> using order: () -> O
-    ) -> Self {
-        order().nsSortDescriptors
+extension ArraySlice: SortDescriptorsConvertible where Element: SortDescriptorsConvertible {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+    public var sortDescriptors: [SortDescriptor<Element.Root>] {
+        flatMap { $0.sortDescriptors }
     }
 
+    public var nsSortDescriptors: [NSSortDescriptor] {
+        flatMap { $0.nsSortDescriptors }
+    }
+}
+
+extension Array where Element == NSSortDescriptor {
+    /// Builds `NSSortDescriptor`s with ``OrderBuilder``.
+    public static func build<Root, O: SortDescriptorsConvertible>(
+        for root: Root.Type = Root.self,
+        @OrderBuilder<Root> using order: () -> O
+    ) -> [NSSortDescriptor] where O.Root == Root {
+        order().nsSortDescriptors
+    }
+}
+
+extension Array {
+    /// Builds `SortDescriptor`s with ``OrderBuilder``.
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+    public static func build<Root, O: SortDescriptorsConvertible>(
+        for root: Root.Type = Root.self,
+        @OrderBuilder<Root> using order: () -> O
+    ) -> [SortDescriptor<Root>] where Element == SortDescriptor<Root>, O.Root == Root {
+        order().sortDescriptors
+    }
 }

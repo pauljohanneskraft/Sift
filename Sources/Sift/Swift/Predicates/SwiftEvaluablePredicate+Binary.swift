@@ -4,7 +4,7 @@ public protocol SwiftEvaluableBinaryPredicateOperator {
 }
 
 extension BinaryPredicate: SwiftEvaluablePredicate where First: SwiftEvaluablePredicate, Second: SwiftEvaluablePredicate, Operator: SwiftEvaluableBinaryPredicateOperator {
-    public func evaluate(on root: First.Root) -> Bool {
+    public func evaluate(on root: Root) -> Bool {
         Operator.combine(elements.first.evaluate(on: root)) {
             elements.second.evaluate(on: root)
         }

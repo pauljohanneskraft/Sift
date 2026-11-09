@@ -10,7 +10,7 @@ extension NotOperator: SwiftEvaluableUnaryPredicateOperator {
 }
 
 extension UnaryPredicate: SwiftEvaluablePredicate where Content: SwiftEvaluablePredicate, Operator: SwiftEvaluableUnaryPredicateOperator {
-    public func evaluate(on root: Content.Root) -> Bool {
+    public func evaluate(on root: Root) -> Bool {
         Operator.transform(content.evaluate(on: root))
     }
 }

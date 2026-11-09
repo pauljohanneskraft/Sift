@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  macos:
+    name: macOS build and test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (warnings as errors)
+        run: swift build --build-tests -Xswiftc -warnings-as-errors
+      - name: Test
+        run: swift test
+
+  apple-platforms:
+    name: iOS build and documentation
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build for iOS
+        run: xcodebuild -scheme Sift-Package -destination 'generic/platform=iOS' build
+      - name: Build documentation
+        run: xcodebuild docbuild -scheme Sift-Package -destination 'generic/platform=macOS'
+
+  linux-core:
+    # SiftFoundation relies on Objective-C keypaths, and SwiftPM builds every test target,
+    # so only the Foundation-free core is built on Linux.
+    name: Linux core build
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      # The swift image ships Foundation, so building alone wouldn't catch an import.
+      - name: Check that Sift doesn't import Foundation
+        run: |
+          if grep -rnE '^\s*(@_exported\s+)?import\s+(Foundation|FoundationEssentials|CoreFoundation)\b' Sources/Sift; then
+            echo "::error::Sources/Sift must not import Foundation"
+            exit 1
+          fi
+      - name: Build Sift
+        run: swift build --target Sift
+      # Compiles the core tests, including the long `&&` chain and the README examples, with
+      # this older compiler, whose type checker gives up sooner than Xcode's.
+      - name: Build core tests
+        run: swift build --target SiftTests
