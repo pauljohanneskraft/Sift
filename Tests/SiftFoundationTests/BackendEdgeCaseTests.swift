@@ -135,14 +135,17 @@ final class BackendEdgeCaseTests: XCTestCase {
         XCTAssertEqual(assertPredicateParity(HasSuffix(\Record.text, "line2"), in: records), [1])
     }
 
+    // Two optional keypaths have no operator overloads; see SiftPredicateValue+Optional.swift.
+    typealias StartEnd<Base: PredicateValueOperator> = KeyPathKeyPathPredicateValue<Record, OptionalComparison<Base>>
+
     func testOptionalKeyPathComparisonsWithNil() {
         // (start, end) in days: (1, 2), (nil, nil), (3, 1), (nil, 2), (2, 2)
-        XCTAssertEqual(assertPredicateParity(\Record.start <= \Record.end, in: records), [1, 5])
-        XCTAssertEqual(assertPredicateParity(\Record.start >= \Record.end, in: records), [3, 5])
-        XCTAssertEqual(assertPredicateParity(\Record.start < \Record.end, in: records), [1])
-        XCTAssertEqual(assertPredicateParity(\Record.start > \Record.end, in: records), [3])
-        XCTAssertEqual(assertPredicateParity(!(\Record.start <= \Record.end), in: records), [2, 3, 4])
-        XCTAssertEqual(assertPredicateParity(\Record.start <= \Record.start, in: records), [1, 3, 5])
+        XCTAssertEqual(assertPredicateParity(StartEnd<LessThanOrEqualOperator<Date>>(\.start, \.end), in: records), [1, 5])
+        XCTAssertEqual(assertPredicateParity(StartEnd<GreaterThanOrEqualOperator<Date>>(\.start, \.end), in: records), [3, 5])
+        XCTAssertEqual(assertPredicateParity(StartEnd<LessThanOperator<Date>>(\.start, \.end), in: records), [1])
+        XCTAssertEqual(assertPredicateParity(StartEnd<GreaterThanOperator<Date>>(\.start, \.end), in: records), [3])
+        XCTAssertEqual(assertPredicateParity(!StartEnd<LessThanOrEqualOperator<Date>>(\.start, \.end), in: records), [2, 3, 4])
+        XCTAssertEqual(assertPredicateParity(StartEnd<LessThanOrEqualOperator<Date>>(\.start, \.start), in: records), [1, 3, 5])
         XCTAssertEqual(assertPredicateParity(\Record.start < Fixture.day(3), in: records), [1, 5])
         XCTAssertEqual(assertPredicateParity(!(\Record.start < Fixture.day(3)), in: records), [2, 3, 4])
     }

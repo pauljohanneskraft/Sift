@@ -119,7 +119,7 @@ final class NSPredicateTests: XCTestCase {
         // deadlines (days): 3, nil, 1, 6, nil
         XCTAssertEqual(assertPredicateParity(\Fixture.deadline < Fixture.day(4)), [1, 3])
         XCTAssertEqual(assertPredicateParity(\Fixture.deadline >= Fixture.day(3)), [1, 4])
-        XCTAssertEqual(assertPredicateParity(Fixture.day(2) < \Fixture.deadline), [1, 4])
+        XCTAssertEqual(assertPredicateParity(\Fixture.deadline > Fixture.day(2)), [1, 4])
         XCTAssertEqual(assertPredicateParity(\Fixture.nickname > "b"), [3])
     }
 

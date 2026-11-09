@@ -55,12 +55,17 @@ final class PredicateEvaluationTests: XCTestCase {
     func testLongChainTypeChecks() {
         // Regression: with the optional ordering overloads, a chain like this one failed with
         // "unable to type-check this expression in reasonable time". It must keep compiling.
+        // Swift 6.0 to 6.2 handle 7 terms, as on `main`; 9 terms fail there on `main` too.
         struct Row { var a = 1.0, b = 1, c = 1.0, d = 1, e = 3.0, f = 1.0, g = 2, h = 1, i = 1 }
         let rows = [Row()]
-        let result = rows.filter(
+        let seven = rows.filter(by: \.a < 5 && \.b > 0 && \.c >= 1 && \.d <= 3 && \.e > 2.5 && \.f < 9 && \.g > 1)
+        XCTAssertEqual(seven.count, 1)
+        #if compiler(>=6.4)
+        let nine = rows.filter(
             by: \.a < 5 && \.b > 0 && \.c >= 1 && \.d <= 3 && \.e > 2.5 && \.f < 9 && \.g > 1 && \.h != 4 && \.i <= 7
         )
-        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(nine.count, 1)
+        #endif
     }
 
     func testExplicitRootKeyPathEqualityInBuilders() {

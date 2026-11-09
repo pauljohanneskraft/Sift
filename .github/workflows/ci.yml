@@ -43,3 +43,7 @@ jobs:
           fi
       - name: Build Sift
         run: swift build --target Sift
+      # Compiles the core tests, including the long `&&` chain and the README examples, with
+      # this older compiler, whose type checker gives up sooner than Xcode's.
+      - name: Build core tests
+        run: swift build --target SiftTests

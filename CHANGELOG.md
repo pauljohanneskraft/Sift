@@ -39,13 +39,16 @@ changes break source compatibility:
   matching inside grapheme clusters, string equality and ordering, NaN, optional
   comparisons where both sides are `nil`, `OneOf` with `nil`, `@objc enum` constants, and
   string comparators with a reversed order.
-- Long `&&` chains type-check quickly again.
+- Long `&&` chains type-check as on `main`: 7 terms with Swift 6.0 to 6.2, 9 terms with Swift 6.4.
 - `nsSortDescriptors` works on OS versions before macOS 12 and iOS 15.
 - Converting a keypath to a non-`@objc` property stops with a message that names it.
 
 ### Additions
 
-- Ordering comparisons and sorting on optional properties.
+- Ordering comparisons and sorting on optional properties. `\.rating >= 4` works directly;
+  to keep long `&&` chains compiling on Swift 6.0 to 6.2, a value on the left (`4 <= \.rating`)
+  or two optional keypaths are built explicitly, for example
+  `KeyPathKeyPathPredicateValue<Item, OptionalComparison<LessThanOperator<Int>>>(\.rating, \.previousRating)`.
 - `Contains`, `HasPrefix`, `HasSuffix` and `OneOf`.
 - Sort descriptors for every integer type, `Float`, `Double`, `Date`, `UUID` and their
   optionals.
