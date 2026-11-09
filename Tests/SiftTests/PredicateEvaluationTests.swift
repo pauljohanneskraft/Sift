@@ -47,6 +47,39 @@ final class PredicateEvaluationTests: XCTestCase {
         XCTAssertEqual(items.filter(by: Or(cheap, \.stock == 4)).stocks, [0, 2, 4])
         XCTAssertEqual(items.filter(by: Xor(cheap, inStock)).stocks, [0, 1, 3, 4])
         XCTAssertEqual(items.filter(by: Nand(cheap, inStock)).stocks, [0, 1, 3, 4])
+        // Orange has both operands false, so Nand and Xor differ.
+        XCTAssertEqual(items.filter(by: Nand(cheap, \.stock > 2)).stocks, [0, 1, 2, 3, 4])
+        XCTAssertEqual(items.filter(by: Xor(cheap, \.stock > 2)).stocks, [0, 2, 3, 4])
+    }
+
+    func testLongChainTypeChecks() {
+        // Regression: with the optional ordering overloads, a chain like this one failed with
+        // "unable to type-check this expression in reasonable time". It must keep compiling.
+        struct Row { var a = 1.0, b = 1, c = 1.0, d = 1, e = 3.0, f = 1.0, g = 2, h = 1, i = 1 }
+        let rows = [Row()]
+        let result = rows.filter(
+            by: \.a < 5 && \.b > 0 && \.c >= 1 && \.d <= 3 && \.e > 2.5 && \.f < 9 && \.g > 1 && \.h != 4 && \.i <= 7
+        )
+        XCTAssertEqual(result.count, 1)
+    }
+
+    func testExplicitRootKeyPathEqualityInBuilders() {
+        // Regression: `\Item.price == \Item.discount` used to resolve to the standard library's
+        // `AnyKeyPath ==` inside builders and became a constant `false`.
+        XCTAssertEqual(items.filterPredicate { \Item.price == \Item.discount }.map(\.name), ["Orange"])
+        let price = \Item.price
+        let discount = \Item.discount
+        XCTAssertEqual(items.filterPredicate { price == discount }.map(\.name), ["Orange"])
+        XCTAssertEqual(items.filterPredicate { \Item.price == \Item.price }.count, items.count)
+        XCTAssertEqual(
+            items.filterPredicate {
+                \Item.stock > 0
+                AnyOf { \Item.price == \Item.discount; \Item.stock == 4 }
+            }.map(\.name),
+            ["Orange", "Kiwi"]
+        )
+        XCTAssertEqual(items.filterPredicate { true }.count, items.count)
+        XCTAssertEqual(items.filterPredicate { false }.count, 0)
     }
 
     func testBooleanPredicate() {

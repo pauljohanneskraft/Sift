@@ -6,76 +6,34 @@ public protocol StringMatchingOperator {
     static func matches(_ value: String, pattern: String, options: String.CompareOptions) -> Bool
 }
 
-extension ContainsOperator: StringMatchingOperator {
-    public static var comparisonType: NSComparisonPredicate.Operator { .contains }
-
-    public static func matches(_ value: String, pattern: String, options: String.CompareOptions) -> Bool {
-        value.range(of: pattern, options: options) != nil
-    }
-}
-
-extension HasPrefixOperator: StringMatchingOperator {
-    public static var comparisonType: NSComparisonPredicate.Operator { .beginsWith }
-
-    public static func matches(_ value: String, pattern: String, options: String.CompareOptions) -> Bool {
-        value.range(of: pattern, options: options.union(.anchored)) != nil
-    }
-}
-
-extension HasSuffixOperator: StringMatchingOperator {
-    public static var comparisonType: NSComparisonPredicate.Operator { .endsWith }
-
-    public static func matches(_ value: String, pattern: String, options: String.CompareOptions) -> Bool {
-        value.range(of: pattern, options: options.union([.anchored, .backwards])) != nil
-    }
-}
-
 extension StringMatchOptions {
+    /// Each Sift option with its `String.CompareOptions` and `NSComparisonPredicate.Options`
+    /// equivalents, so the two mappings can't drift apart.
+    private static let mapping: [(StringMatchOptions, String.CompareOptions, NSComparisonPredicate.Options)] = [
+        (.caseInsensitive, .caseInsensitive, .caseInsensitive),
+        (.diacriticInsensitive, .diacriticInsensitive, .diacriticInsensitive),
+    ]
+
     var compareOptions: String.CompareOptions {
-        var result: String.CompareOptions = []
-        if contains(.caseInsensitive) { result.insert(.caseInsensitive) }
-        if contains(.diacriticInsensitive) { result.insert(.diacriticInsensitive) }
-        return result
+        Self.mapping.reduce(into: []) { result, entry in
+            if contains(entry.0) { result.insert(entry.1) }
+        }
     }
 
     var comparisonPredicateOptions: NSComparisonPredicate.Options {
-        var result: NSComparisonPredicate.Options = []
-        if contains(.caseInsensitive) { result.insert(.caseInsensitive) }
-        if contains(.diacriticInsensitive) { result.insert(.diacriticInsensitive) }
-        return result
-    }
-}
-
-// Evaluated here rather than in `Sift`, so in-memory matching uses the same Foundation string
-// comparison as `NSPredicate`. Module-qualified names mark the conformance as intentional (SE-0364).
-extension Sift.StringPredicateValue: Sift.SwiftEvaluablePredicate where Operator: StringMatchingOperator {
-    public func evaluate(on root: Root) -> Bool {
-        guard let value = root[keyPath: keyPath].siftStringValue else {
-            return false
+        Self.mapping.reduce(into: []) { result, entry in
+            if contains(entry.0) { result.insert(entry.2) }
         }
-        return Operator.matches(value, pattern: pattern, options: options.compareOptions)
     }
 }
 
 extension StringPredicateValue: NSPredicateConvertible where Root: NSObject, Operator: StringMatchingOperator {
     public var predicate: NSPredicate {
-        NSComparisonPredicate(
-            leftExpression: NSExpression(forKeyPath: keyPath),
-            rightExpression: NSExpression(forConstantValue: pattern),
-            modifier: .direct,
-            type: Operator.comparisonType,
+        comparison(
+            keyPathExpression(keyPath),
+            Operator.comparisonType,
+            NSExpression(forConstantValue: pattern),
             options: options.comparisonPredicateOptions
-        )
-    }
-}
-
-extension MembershipPredicateValue: NSPredicateConvertible where Root: NSObject, Value: Equatable {
-    public var predicate: NSPredicate {
-        NSComparisonPredicate(
-            leftExpression: NSExpression(forKeyPath: keyPath),
-            rightExpression: NSExpression(forConstantValue: values),
-            modifier: .direct,
-            type: .in
         )
     }
 }

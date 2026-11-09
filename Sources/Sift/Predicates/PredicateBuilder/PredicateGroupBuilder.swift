@@ -8,6 +8,10 @@
 @resultBuilder
 public enum PredicateGroupBuilder<Root, Combinator: PredicateGroupCombinator> {
 
+    // Disfavored: otherwise `\Item.price == \Item.discount` (explicit roots or keypath
+    // variables) resolves to the standard library's `AnyKeyPath ==`, which returns `Bool`,
+    // and the comparison silently becomes a constant.
+    @_disfavoredOverload
     public static func buildExpression(_ expression: Bool) -> BooleanPredicate<Root> {
         .init(expression)
     }
@@ -27,7 +31,7 @@ public enum PredicateGroupBuilder<Root, Combinator: PredicateGroupCombinator> {
     public static func buildPartialBlock<A: SiftPredicate<Root>, B: SiftPredicate<Root>>(
         accumulated: A,
         next: B
-    ) -> BinaryPredicate<A, B, Combinator> {
+    ) -> BinaryPredicate<Root, A, B, Combinator> {
         .init(accumulated, next)
     }
 

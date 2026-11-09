@@ -173,6 +173,10 @@ let words = ["apple", "Kiwi", "Avocado"].filterPredicate {
 
 Sort descriptors are available for keypaths to `Bool`, the integer types, `Double`, `Float`, `Date` and `UUID`, and their optionals. For `String`, use a comparator.
 
+Every property in a converted keypath must be `@objc`. A stored `Int?` or `Double?` can't be `@objc`, so optional scalars only work through optional chaining, such as `\.parent?.rank`. Compared values must be of a type key-value coding can represent: the scalar types, `String`, `Date`, `Data`, `UUID`, `URL`, `NSObject` subclasses and their optionals. Other types, such as `Decimal`, don't compile; use `NSDecimalNumber`. An `@objc enum` works once you declare `extension MyEnum: NSPredicateUsableValue {}`, and is compared by raw value.
+
+With `SiftFoundation` in your program, in-memory evaluation compares strings and floating-point values exactly as Foundation does, so `filter(by:)` and a Core Data fetch return the same objects, even for decomposed accents or `NaN`.
+
 ### 🧩 Extending Sift
 
 Predicates and orders are plain values. Backends give them meaning through conditional conformances:

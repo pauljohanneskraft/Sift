@@ -13,36 +13,34 @@ where First: NSPredicateConvertible, Second: NSPredicateConvertible, Operator: N
 
 extension AndOperator: NSPredicateConvertibleBinaryPredicateOperator {
     public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
-        NSCompoundPredicate(andPredicateWithSubpredicates: [first, second])
+        compoundPredicate(.and, [first, second])
     }
 }
 
 extension OrOperator: NSPredicateConvertibleBinaryPredicateOperator {
     public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
-        NSCompoundPredicate(orPredicateWithSubpredicates: [first, second])
+        compoundPredicate(.or, [first, second])
     }
 }
 
 extension XorOperator: NSPredicateConvertibleBinaryPredicateOperator {
+    /// `TERNARY(A, 1, 0) != TERNARY(B, 1, 0)`. Written with only AND, OR and NOT, XOR needs
+    /// each operand twice, so nested `Xor`s would double in size at every level. Conditional
+    /// expressions are evaluated in memory and by Core Data's SQLite store.
     public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
-        // (A AND NOT B) OR (NOT A AND B)
-        NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSCompoundPredicate(andPredicateWithSubpredicates: [
-                first, NSCompoundPredicate(notPredicateWithSubpredicate: second),
-            ]),
-            NSCompoundPredicate(andPredicateWithSubpredicates: [
-                NSCompoundPredicate(notPredicateWithSubpredicate: first), second,
-            ]),
-        ])
+        func bit(_ predicate: NSPredicate) -> NSExpression {
+            NSExpression(
+                forConditional: predicate,
+                trueExpression: NSExpression(forConstantValue: 1),
+                falseExpression: NSExpression(forConstantValue: 0)
+            )
+        }
+        return comparison(bit(first), .notEqualTo, bit(second))
     }
 }
 
 extension NandOperator: NSPredicateConvertibleBinaryPredicateOperator {
     public static func combine(_ first: NSPredicate, with second: NSPredicate) -> NSPredicate {
-        NSCompoundPredicate(
-            notPredicateWithSubpredicate: NSCompoundPredicate(
-                andPredicateWithSubpredicates: [first, second]
-            )
-        )
+        NSCompoundPredicate(notPredicateWithSubpredicate: compoundPredicate(.and, [first, second]))
     }
 }

@@ -4,9 +4,6 @@ public protocol PredicateValueOperator {
     associatedtype Value
 }
 
-/// A leaf predicate that compares keypath values with a ``PredicateValueOperator``.
-public protocol SiftPredicateValue<Root, Operator>: SiftPredicate where Operator: PredicateValueOperator {}
-
 public enum EqualOperator<Value>: PredicateValueOperator {}
 public enum NotEqualOperator<Value>: PredicateValueOperator {}
 public enum GreaterThanOperator<Value>: PredicateValueOperator {}

@@ -1,5 +1,9 @@
 import Foundation
 
+// Only the members that produce `SortDescriptor` require macOS 12 / iOS 15. The conformances
+// themselves aren't gated, so `nsSortDescriptors`, which only needs `NSSortDescriptor`, works
+// on every OS version.
+
 /// An order operator, such as a keypath, that can produce sort descriptors in either direction.
 public protocol SortDescriptorsConvertibleOperator<Root> {
     associatedtype Root
@@ -14,8 +18,13 @@ public protocol SortDescriptorsConvertibleOperator<Root> {
 /// `Bool`, the integer types, `Double`, `Float`, `Date` and `UUID` conform, and so do their
 /// optionals. Strings are sorted with a comparator instead; see
 /// `Ascending(_:comparator:)`.
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+///
+/// Every property in the keypath must still be `@objc`. A stored `Int?`, `Double?` or
+/// `Bool?` can't be `@objc`, so an optional of those types only works through optional
+/// chaining, as in `\.parent?.rank`. Converting a keypath to a non-`@objc` property stops
+/// with a message that names the keypath.
 public protocol SortDescriptorUsableValue {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Self>,
         order: SortOrder
@@ -26,16 +35,16 @@ public protocol SortDescriptorUsableValue {
 ///
 /// Swift allows `Optional` only one conditional conformance to `SortDescriptorUsableValue`,
 /// so the optional case is forwarded through this protocol on the wrapped type.
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 public protocol SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Self?>,
         order: SortOrder
     ) -> SortDescriptor<Root>
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Optional: SortDescriptorUsableValue where Wrapped: SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Wrapped?>,
         order: SortOrder
@@ -45,24 +54,32 @@ extension Optional: SortDescriptorUsableValue where Wrapped: SortDescriptorUsabl
 }
 
 @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
-extension KeyPath: SortDescriptorsConvertible where Root: NSObject, Value: SortDescriptorUsableValue {
-    public var sortDescriptors: [SortDescriptor<Root>] {
-        [Value.sortDescriptor(for: self, order: .forward)]
-    }
-
-    public var nsSortDescriptors: [NSSortDescriptor] {
-        [.init(keyPath: self, ascending: true)]
+extension SortOrder {
+    init(ascending: Bool) {
+        self = ascending ? .forward : .reverse
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+extension KeyPath: SortDescriptorsConvertible where Root: NSObject, Value: SortDescriptorUsableValue {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+    public var sortDescriptors: [SortDescriptor<Root>] {
+        sortDescriptors(ascending: true)
+    }
+
+    public var nsSortDescriptors: [NSSortDescriptor] {
+        nsSortDescriptors(ascending: true)
+    }
+}
+
 extension KeyPath: SortDescriptorsConvertibleOperator where Root: NSObject, Value: SortDescriptorUsableValue {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public func sortDescriptors(ascending: Bool) -> [SortDescriptor<Root>] {
-        [Value.sortDescriptor(for: self, order: ascending ? .forward : .reverse)]
+        _ = kvcKeyPath(self)
+        return [Value.sortDescriptor(for: self, order: SortOrder(ascending: ascending))]
     }
 
     public func nsSortDescriptors(ascending: Bool) -> [NSSortDescriptor] {
-        [.init(keyPath: self, ascending: ascending)]
+        [NSSortDescriptor(key: kvcKeyPath(self), ascending: ascending)]
     }
 }
 
@@ -99,12 +116,9 @@ extension Reverse: SortDescriptorsConvertible where O: SortDescriptorsConvertibl
     }
 
     public var nsSortDescriptors: [NSSortDescriptor] {
-        self.order.nsSortDescriptors.compactMap { descriptor in
-            guard let reversedDescriptor = descriptor.reversedSortDescriptor as? NSSortDescriptor else {
-                assertionFailure("Reversal of NSSortDescriptor failed.")
-                return nil
-            }
-            return reversedDescriptor
+        self.order.nsSortDescriptors.map { descriptor in
+            // `reversedSortDescriptor` is always an `NSSortDescriptor` for an `NSSortDescriptor`.
+            descriptor.reversedSortDescriptor as! NSSortDescriptor
         }
     }
 }

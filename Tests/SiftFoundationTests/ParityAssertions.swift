@@ -43,3 +43,44 @@ func requireSortDescriptors() throws {
         throw XCTSkip("SortDescriptor requires macOS 12 / iOS 15")
     }
 }
+
+/// A test record with an id, so the parity helpers can report which records were selected.
+protocol ParityRecord: NSObject {
+    var id: Int { get }
+}
+
+extension Fixture: ParityRecord {}
+
+/// ``assertPredicateParity(_:on:file:line:)`` for any ``ParityRecord`` type.
+@discardableResult
+func assertPredicateParity<P: SwiftEvaluablePredicate & NSPredicateConvertible>(
+    _ predicate: P,
+    in records: [P.Root],
+    file: StaticString = #filePath,
+    line: UInt = #line
+) -> [Int] where P.Root: ParityRecord {
+    let nsPredicate = predicate.predicate
+    let swift = records.filter { predicate.evaluate(on: $0) }.map(\.id)
+    let foundation = records.filter { nsPredicate.evaluate(with: $0) }.map(\.id)
+    XCTAssertEqual(swift, foundation, "Backends disagree on \(nsPredicate)", file: file, line: line)
+    return swift
+}
+
+/// ``assertOrderParity(_:on:file:line:)`` for any ``ParityRecord`` type.
+@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
+@discardableResult
+func assertOrderParity<O: SwiftEvaluableOrder & SortDescriptorsConvertible>(
+    _ order: O,
+    in records: [O.Root],
+    file: StaticString = #filePath,
+    line: UInt = #line
+) -> [Int] where O.Root: ParityRecord {
+    let swift = records.sorted(by: order).map(\.id)
+    let foundation = records.sorted(using: order.sortDescriptors).map(\.id)
+    let nsFoundation = (records as NSArray)
+        .sortedArray(using: order.nsSortDescriptors)
+        .map { ($0 as! O.Root).id }
+    XCTAssertEqual(swift, foundation, "Swift and SortDescriptor disagree", file: file, line: line)
+    XCTAssertEqual(swift, nsFoundation, "Swift and NSSortDescriptor disagree", file: file, line: line)
+    return swift
+}

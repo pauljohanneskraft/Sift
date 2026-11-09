@@ -47,7 +47,6 @@ descriptors with the `SiftFoundation` module.
 
 ### Comparisons
 
-- ``SiftPredicateValue``
 - ``KeyPathValuePredicateValue``
 - ``KeyPathKeyPathPredicateValue``
 - ``PredicateValueOperator``
@@ -83,3 +82,8 @@ descriptors with the `SiftFoundation` module.
 - ``ConcatenatedOrder``
 - ``OptionalKeyPathOrder``
 - ``OrderBuilder``
+
+### In-memory comparison semantics
+
+- ``SiftCustomComparable``
+- ``SiftOrdering``

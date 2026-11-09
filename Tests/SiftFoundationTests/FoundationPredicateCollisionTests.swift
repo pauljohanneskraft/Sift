@@ -17,9 +17,12 @@ private func usesSiftPredicate<P: SiftPredicate>(_ predicate: P) -> P {
 final class FoundationPredicateCollisionTests: XCTestCase {
     func testBothPredicateTypesAreUsable() {
         _ = usesSiftPredicate(\Fixture.id == 1)
+        // The `#Predicate` macro needs a Swift 5.9 compiler, while the package supports 5.7.
+        #if compiler(>=5.9)
         if #available(macOS 14, iOS 17, tvOS 17, watchOS 10, *) {
             let predicate = usesFoundationPredicate(#Predicate<Int> { $0 > 1 })
             XCTAssertEqual(try predicate.evaluate(2), true)
         }
+        #endif
     }
 }

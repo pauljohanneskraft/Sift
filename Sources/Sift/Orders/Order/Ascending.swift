@@ -6,6 +6,10 @@
 public struct Ascending<Root, Operator: OrderOperator<Root>>: Order {
     public let `operator`: Operator
 
+    // Disfavored so that `let order = Ascending(\Item.rating)` with an optional `rating`
+    // picks the `OptionalKeyPathOrder` overload instead of using the keypath itself as
+    // `Operator`, which can't be sorted in memory.
+    @_disfavoredOverload
     public init(_ op: Operator) {
         self.operator = op
     }

@@ -15,39 +15,42 @@ extension KeyPathValuePredicateValue: SwiftEvaluablePredicate where Operator: Sw
     }
 }
 
+// The comparisons go through `SiftComparison`, so a `SiftCustomComparable` value type, such
+// as `String` with `SiftFoundation`, is compared with its custom semantics.
+
 extension EqualOperator: SwiftEvaluablePredicateValueOperator where Value: Equatable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first == second
+        SiftComparison.isEqual(first, second)
     }
 }
 
 extension NotEqualOperator: SwiftEvaluablePredicateValueOperator where Value: Equatable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first != second
+        !SiftComparison.isEqual(first, second)
     }
 }
 
 extension LessThanOperator: SwiftEvaluablePredicateValueOperator where Value: Comparable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first < second
+        SiftComparison.compare(first, second) == .ascending
     }
 }
 
 extension LessThanOrEqualOperator: SwiftEvaluablePredicateValueOperator where Value: Comparable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first <= second
+        SiftComparison.compare(first, second) != .descending
     }
 }
 
 extension GreaterThanOperator: SwiftEvaluablePredicateValueOperator where Value: Comparable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first > second
+        SiftComparison.compare(first, second) == .descending
     }
 }
 
 extension GreaterThanOrEqualOperator: SwiftEvaluablePredicateValueOperator where Value: Comparable {
     public static func compare(_ first: Value, with second: Value) -> Bool {
-        first >= second
+        SiftComparison.compare(first, second) != .ascending
     }
 }
 

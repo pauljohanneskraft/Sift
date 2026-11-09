@@ -6,6 +6,8 @@
 public struct Reverse<Root, O: Order<Root>>: Order {
     public let order: O
 
+    // Disfavored for optional keypaths; see `Ascending.init(_:)`.
+    @_disfavoredOverload
     public init(_ order: O) {
         self.order = order
     }

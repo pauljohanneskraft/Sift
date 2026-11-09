@@ -23,9 +23,10 @@ where Operator: SwiftEvaluablePredicateValueOperator { … }
 extension LessThanOperator: SwiftEvaluablePredicateValueOperator where Value: Comparable { … }
 ```
 
-So the expression `\.name < 3` is a valid ``SiftPredicate`` whatever the types are. It can
-only be *evaluated* when every node and operator in the tree has a conformance for the
-backend in use.
+The DSL itself only checks what it needs to build the tree: both sides of a comparison
+must have the same type, and the ordering operators `<`, `<=`, `>` and `>=` require a
+`Comparable` value (or an optional of one). A tree can then only be *evaluated* when every
+node and operator in it has a conformance for the backend in use.
 
 ## Adding an operator
 
@@ -35,6 +36,16 @@ backend in use.
 
 If you skip a backend, expressions using the operator still compile, but that backend's
 entry points, such as `filter(by:)` or `.predicate`, won't accept them.
+
+## Custom orders and comparison semantics
+
+A custom ``SwiftEvaluableOrder`` only needs ``SwiftEvaluableOrder/isLessThan(_:_:)``.
+Implement ``SwiftEvaluableOrder/compare(_:_:)`` too when a three-way comparison is cheaper;
+`.then` chains and arrays of orders use it.
+
+To change how a value type compares in memory, conform it to ``SiftCustomComparable``.
+`SiftFoundation` does this for `String` and the floating-point types, so that in-memory
+results match Foundation's.
 
 ## Adding a backend
 

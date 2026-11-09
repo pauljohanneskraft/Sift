@@ -62,7 +62,14 @@ final class SortDescriptorTests: XCTestCase {
     func testOptionalValues() throws {
         try requireSortDescriptors()
         guard #available(macOS 12, iOS 15, tvOS 15, watchOS 8, *) else { return }
-        let order = Ascending(\Fixture.deadline).then(Ascending(\Fixture.id))
+        // Stored outside any call, the optional `@objc let` keypath must still resolve to the
+        // optional-keypath order, so this order can also be sorted in memory.
+        let deadline = Ascending(\Fixture.deadline)
+        XCTAssertTrue(type(of: deadline) == Ascending<Fixture, OptionalKeyPathOrder<Fixture, Date>>.self)
+        let parent = Ascending(\Record.parent?.id)
+        XCTAssertTrue(type(of: parent) == Ascending<Record, OptionalKeyPathOrder<Record, Int>>.self)
+        let order = deadline.then(Ascending(\Fixture.id))
+        XCTAssertEqual(Fixture.all.sorted(by: order).map(\.id), [2, 5, 3, 1, 4])
         let foundation = Fixture.all.sorted(using: order.sortDescriptors).map(\.id)
         let nsFoundation = (Fixture.all as NSArray).sortedArray(using: order.nsSortDescriptors).map { ($0 as! Fixture).id }
         XCTAssertEqual(foundation, nsFoundation)

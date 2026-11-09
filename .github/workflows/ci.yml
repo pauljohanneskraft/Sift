@@ -34,5 +34,12 @@ jobs:
     container: swift:6.0
     steps:
       - uses: actions/checkout@v4
+      # The swift image ships Foundation, so building alone wouldn't catch an import.
+      - name: Check that Sift doesn't import Foundation
+        run: |
+          if grep -rnE '^\s*(@_exported\s+)?import\s+(Foundation|FoundationEssentials|CoreFoundation)\b' Sources/Sift; then
+            echo "::error::Sources/Sift must not import Foundation"
+            exit 1
+          fi
       - name: Build Sift
         run: swift build --target Sift

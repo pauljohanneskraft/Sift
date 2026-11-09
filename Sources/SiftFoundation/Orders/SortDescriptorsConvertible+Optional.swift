@@ -1,8 +1,8 @@
 import Foundation
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension OptionalKeyPathOrder: SortDescriptorsConvertible
 where Root: NSObject, Wrapped: SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public var sortDescriptors: [SortDescriptor<Root>] {
         sortDescriptors(ascending: true)
     }
@@ -12,14 +12,15 @@ where Root: NSObject, Wrapped: SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension OptionalKeyPathOrder: SortDescriptorsConvertibleOperator
 where Root: NSObject, Wrapped: SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public func sortDescriptors(ascending: Bool) -> [SortDescriptor<Root>] {
-        [Wrapped.sortDescriptor(forOptional: keyPath, order: ascending ? .forward : .reverse)]
+        _ = kvcKeyPath(keyPath)
+        return [Wrapped.sortDescriptor(forOptional: keyPath, order: SortOrder(ascending: ascending))]
     }
 
     public func nsSortDescriptors(ascending: Bool) -> [NSSortDescriptor] {
-        [NSSortDescriptor(keyPath: keyPath, ascending: ascending)]
+        [NSSortDescriptor(key: kvcKeyPath(keyPath), ascending: ascending)]
     }
 }

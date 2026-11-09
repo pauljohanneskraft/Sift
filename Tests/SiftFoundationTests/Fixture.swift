@@ -22,8 +22,8 @@ final class Fixture: NSObject {
         self.name = name
         self.nickname = nickname
         self.category = category
-        self.date = Fixture.referenceDate.addingTimeInterval(day * 86_400)
-        self.deadline = deadlineDay.map { Fixture.referenceDate.addingTimeInterval($0 * 86_400) }
+        self.date = Fixture.day(day)
+        self.deadline = deadlineDay.map(Fixture.day)
     }
 
     override var description: String { "Fixture(\(id))" }

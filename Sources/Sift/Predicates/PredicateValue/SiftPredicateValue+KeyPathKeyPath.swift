@@ -3,7 +3,7 @@
 public struct KeyPathKeyPathPredicateValue<
     Root,
     Operator: PredicateValueOperator
->: SiftPredicateValue {
+>: SiftPredicate {
     public typealias Value = Operator.Value
 
     public let keyPaths: (KeyPath<Root, Value>, KeyPath<Root, Value>)
@@ -31,28 +31,28 @@ public func != <Root, Value>(
 
 // MARK: Order
 
-public func < <Root, Value>(
+public func < <Root, Value: Comparable>(
     lhs: KeyPath<Root, Value>,
     rhs: KeyPath<Root, Value>
 ) -> KeyPathKeyPathPredicateValue<Root, LessThanOperator<Value>> {
     .init(lhs, rhs)
 }
 
-public func <= <Root, Value>(
+public func <= <Root, Value: Comparable>(
     lhs: KeyPath<Root, Value>,
     rhs: KeyPath<Root, Value>
 ) -> KeyPathKeyPathPredicateValue<Root, LessThanOrEqualOperator<Value>> {
     .init(lhs, rhs)
 }
 
-public func > <Root, Value>(
+public func > <Root, Value: Comparable>(
     lhs: KeyPath<Root, Value>,
     rhs: KeyPath<Root, Value>
 ) -> KeyPathKeyPathPredicateValue<Root, GreaterThanOperator<Value>> {
     .init(lhs, rhs)
 }
 
-public func >= <Root, Value>(
+public func >= <Root, Value: Comparable>(
     lhs: KeyPath<Root, Value>,
     rhs: KeyPath<Root, Value>
 ) -> KeyPathKeyPathPredicateValue<Root, GreaterThanOrEqualOperator<Value>> {

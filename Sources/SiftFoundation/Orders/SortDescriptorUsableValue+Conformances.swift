@@ -3,8 +3,8 @@ import Foundation
 // Each type forwards to the matching concrete `SortDescriptor` initializer, which Foundation
 // provides for `NSObject` roots.
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Bool: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Bool>,
         order: SortOrder
@@ -12,6 +12,7 @@ extension Bool: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Bool?>,
         order: SortOrder
@@ -20,8 +21,8 @@ extension Bool: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Double: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Double>,
         order: SortOrder
@@ -29,6 +30,7 @@ extension Double: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Double?>,
         order: SortOrder
@@ -37,8 +39,8 @@ extension Double: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Float: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Float>,
         order: SortOrder
@@ -46,6 +48,7 @@ extension Float: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Float?>,
         order: SortOrder
@@ -54,8 +57,8 @@ extension Float: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Int: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Int>,
         order: SortOrder
@@ -63,6 +66,7 @@ extension Int: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Int?>,
         order: SortOrder
@@ -71,8 +75,8 @@ extension Int: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Int8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Int8>,
         order: SortOrder
@@ -80,6 +84,7 @@ extension Int8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Int8?>,
         order: SortOrder
@@ -88,8 +93,8 @@ extension Int8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Int16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Int16>,
         order: SortOrder
@@ -97,6 +102,7 @@ extension Int16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Int16?>,
         order: SortOrder
@@ -105,8 +111,8 @@ extension Int16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Int32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Int32>,
         order: SortOrder
@@ -114,6 +120,7 @@ extension Int32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Int32?>,
         order: SortOrder
@@ -122,8 +129,8 @@ extension Int32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Int64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Int64>,
         order: SortOrder
@@ -131,6 +138,7 @@ extension Int64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Int64?>,
         order: SortOrder
@@ -139,8 +147,8 @@ extension Int64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UInt: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UInt>,
         order: SortOrder
@@ -148,6 +156,7 @@ extension UInt: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UInt?>,
         order: SortOrder
@@ -156,8 +165,8 @@ extension UInt: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UInt8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UInt8>,
         order: SortOrder
@@ -165,6 +174,7 @@ extension UInt8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UInt8?>,
         order: SortOrder
@@ -173,8 +183,8 @@ extension UInt8: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped 
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UInt16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UInt16>,
         order: SortOrder
@@ -182,6 +192,7 @@ extension UInt16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UInt16?>,
         order: SortOrder
@@ -190,8 +201,8 @@ extension UInt16: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UInt32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UInt32>,
         order: SortOrder
@@ -199,6 +210,7 @@ extension UInt32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UInt32?>,
         order: SortOrder
@@ -207,8 +219,8 @@ extension UInt32: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UInt64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UInt64>,
         order: SortOrder
@@ -216,6 +228,7 @@ extension UInt64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UInt64?>,
         order: SortOrder
@@ -224,8 +237,8 @@ extension UInt64: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension Date: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, Date>,
         order: SortOrder
@@ -233,6 +246,7 @@ extension Date: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, Date?>,
         order: SortOrder
@@ -241,8 +255,8 @@ extension Date: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
     }
 }
 
-@available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
 extension UUID: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         for keyPath: KeyPath<Root, UUID>,
         order: SortOrder
@@ -250,6 +264,7 @@ extension UUID: SortDescriptorUsableValue, SortDescriptorUsableOptionalWrapped {
         .init(keyPath, order: order)
     }
 
+    @available(macOS 12, iOS 15, tvOS 15, watchOS 8, *)
     public static func sortDescriptor<Root: NSObject>(
         forOptional keyPath: KeyPath<Root, UUID?>,
         order: SortOrder

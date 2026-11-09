@@ -47,6 +47,9 @@ final class NSPredicateTests: XCTestCase {
         XCTAssertEqual(assertPredicateParity(!fruit), [3, 5])
         XCTAssertEqual(assertPredicateParity(Xor(fruit, highRank)), [2, 3, 4, 5])
         XCTAssertEqual(assertPredicateParity(Nand(fruit, highRank)), [2, 3, 4, 5])
+        // Rows 2 and 4 have both operands false, so Nand, Xor and And all differ.
+        XCTAssertEqual(assertPredicateParity(Nand(\Fixture.bool == true, highRank)), [2, 4])
+        XCTAssertEqual(assertPredicateParity(And(\Fixture.bool == true, highRank)), [1, 3, 5])
         XCTAssertEqual(assertPredicateParity(Xor(\Fixture.bool == true, highRank)), [])
     }
 
@@ -68,8 +71,8 @@ final class NSPredicateTests: XCTestCase {
     }
 
     func testBuilderConditionals() {
-        func predicate(category: String?, cheap: Bool) -> NSPredicate {
-            NSPredicate.build(for: Fixture.self) {
+        func predicate(category: String?, cheap: Bool) -> some SwiftEvaluablePredicate<Fixture> & NSPredicateConvertible {
+            AllOf(for: Fixture.self) {
                 if let category = category {
                     \.category == category
                 }
@@ -80,12 +83,29 @@ final class NSPredicateTests: XCTestCase {
                 }
             }
         }
-        func ids(_ predicate: NSPredicate) -> [Int] {
-            Fixture.all.filter { predicate.evaluate(with: $0) }.map(\.id)
+        XCTAssertEqual(assertPredicateParity(predicate(category: nil, cheap: true)), [2, 4])
+        XCTAssertEqual(assertPredicateParity(predicate(category: "fruit", cheap: false)), [1])
+        XCTAssertEqual(assertPredicateParity(predicate(category: "drink", cheap: true)), [])
+        XCTAssertEqual(
+            predicate(category: "fruit", cheap: true).predicate.predicateFormat,
+            NSPredicate.build(for: Fixture.self) { \.category == "fruit"; \.double < 2 }.predicateFormat
+        )
+    }
+
+    func testExplicitRootKeyPathEqualityInBuilders() {
+        // Regression: these used to resolve to the standard library's `AnyKeyPath ==` and
+        // became TRUEPREDICATE or FALSEPREDICATE.
+        XCTAssertEqual(NSPredicate.build(for: Fixture.self) { \Fixture.id == \Fixture.rank }.predicateFormat, "id == rank")
+        let id = \Fixture.id
+        let rank = \Fixture.rank
+        XCTAssertEqual(NSPredicate.build(for: Fixture.self) { id == rank }.predicateFormat, "id == rank")
+        let predicate = AllOf(for: Fixture.self) {
+            \Fixture.rank > 1
+            \Fixture.id == \Fixture.rank
         }
-        XCTAssertEqual(ids(predicate(category: nil, cheap: true)), [2, 4])
-        XCTAssertEqual(ids(predicate(category: "fruit", cheap: false)), [1])
-        XCTAssertEqual(ids(predicate(category: "drink", cheap: true)), [])
+        XCTAssertEqual(predicate.predicate.predicateFormat, "rank > 1 AND id == rank")
+        XCTAssertEqual(assertPredicateParity(predicate), [2, 3, 5])
+        XCTAssertEqual(NSPredicate.build(for: Fixture.self) { true }.predicateFormat, "TRUEPREDICATE")
     }
 
     func testNilConstants() {

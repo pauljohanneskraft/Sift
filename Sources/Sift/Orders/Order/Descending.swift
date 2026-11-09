@@ -6,6 +6,8 @@
 public struct Descending<Root, Operator: OrderOperator<Root>>: Order {
     public let `operator`: Operator
 
+    // Disfavored for optional keypaths; see `Ascending.init(_:)`.
+    @_disfavoredOverload
     public init(_ op: Operator) {
         self.operator = op
     }
